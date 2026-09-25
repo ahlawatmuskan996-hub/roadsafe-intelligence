@@ -12,6 +12,7 @@ import CompareView from "@/components/CompareView";
 import PredictivePanel from "@/components/PredictivePanel";
 import Preloader from "@/components/Preloader";
 import Reveal from "@/components/Reveal";
+import RiskLadder from "@/components/RiskLadder";
 import { getWeatherForCity } from "@/lib/weatherApi";
 
 const TABS = [
@@ -73,7 +74,9 @@ function ApiBadge() {
     >
       <span className={`dot-pulse ${info?.ok === true ? "text-safe" : info ? "text-risk" : "text-faint"}`} />
       {info?.ok
-        ? `api · ${info.service} · v${info.version} · live`
+        ? `api · ${info.service} · v${info.version} · live · updated ${new Date(
+            info.generatedAt
+          ).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })} IST`
         : info
         ? "api · unreachable · client eval"
         : "api · connecting…"}
@@ -162,6 +165,9 @@ export default function Page() {
                   </h1>
                   <p className="kicker mt-1.5 !text-[9.5px] text-faint">
                     Location-based road-risk intelligence · India
+                  </p>
+                  <p className="font-mono text-[9px] text-faint/80">
+                    Reference: MoRTH 2022 — 4,61,312 crashes · 1,68,491 fatalities nationwide
                   </p>
                 </div>
               </div>
@@ -287,6 +293,7 @@ export default function Page() {
         {/* ===== Active tab ===== */}
         <div key={tab} className="tab-in">
           {tab === "overview" && (
+            <>
             <div className="grid gap-8 lg:grid-cols-3">
               <div className="lg:col-span-2">
                 <Reveal active={booted} delay={200}>
@@ -326,6 +333,17 @@ export default function Page() {
                 </aside>
               </Reveal>
             </div>
+
+            <Reveal active={booted} delay={380}>
+              <RiskLadder
+                onSelectCity={setActiveCity}
+                onSelectSegment={(s) => {
+                  setSelectedId(s.id);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              />
+            </Reveal>
+            </>
           )}
 
           {tab === "lab" && (

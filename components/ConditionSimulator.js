@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   computeRisk,
   buildRecommendations,
@@ -28,6 +28,38 @@ export default function ConditionSimulator({ segment }) {
   const delta = current.score - base.score;
   const recs = buildRecommendations(current.breakdown);
   const st = LEVEL_STYLES[current.level.key];
+
+  const [engine, setEngine] = useState({ state: "idle" });
+  const pending = useRef(null);
+  useEffect(() => {
+    const payload = { ...segment, ...state };
+    clearTimeout(pending.current);
+    setEngine((e) => ({ state: "running", latency: e.latency }));
+    pending.current = setTimeout(async () => {
+      const t0 = performance.now();
+      try {
+        const res = await fetch("/api/risk", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ segment: payload }),
+          cache: "no-store",
+        });
+        const data = await res.json();
+        const latency = Math.max(1, Math.round(performance.now() - t0));
+        setEngine({
+          state: "ok",
+          latency,
+          score: data.score,
+          level: data.level,
+          match: data.score === computeRisk(payload).score,
+          error: null,
+        });
+      } catch {
+        setEngine({ state: "offline", error: "offline" });
+      }
+    }, 320);
+    return () => clearTimeout(pending.current);
+  }, [JSON.stringify(state)]);
 
   if (!segment) return null;
 
@@ -74,11 +106,34 @@ export default function ConditionSimulator({ segment }) {
     <div className="grid gap-5 lg:grid-cols-5">
       {/* Controls */}
       <div className="panel p-5 lg:col-span-2">
-        <h4 className="mb-0.5 text-[13.5px] font-medium text-ink">{segment.name}</h4>
-        <p className="mb-5 font-mono text-[10.5px] text-faint">
-          {segment.city} · baseline risk{" "}
-          <span className="tabular text-muted">{base.score}</span>
-        </p>
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h4 className="mb-0.5 truncate text-[13.5px] font-medium text-ink">{segment.name}</h4>
+            <p className="font-mono text-[10.5px] text-faint">
+              {segment.city} · baseline risk{" "}
+              <span className="tabular text-muted">{base.score}</span>
+            </p>
+          </div>
+          <div
+            className={`shrink-0 rounded border px-2 py-1 font-mono text-[9px] uppercase tracking-widest transition-colors ${
+              engine.state === "ok"
+                ? "border-safe/40 bg-safe/[0.06] text-safe"
+                : engine.state === "running"
+                ? "border-white/10 bg-white/[0.03] text-faint"
+                : engine.state === "offline"
+                ? "border-warn/40 bg-warn/[0.06] text-warn"
+                : "border-white/10 bg-white/[0.03] text-faint"
+            }`}
+          >
+            {engine.state === "ok"
+              ? `server engine · ${engine.latency}ms · ${engine.match ? "matched" : "mismatch"}`
+              : engine.state === "running"
+              ? "server engine · …"
+              : engine.state === "offline"
+              ? "engine offline · client eval"
+              : "engine idle"}
+          </div>
+        </div>
 
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-2">

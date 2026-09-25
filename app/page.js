@@ -53,6 +53,34 @@ function KpiNum({ value, active, decimals = 0, className }) {
   return <span className={className}>{v.toFixed(decimals)}</span>;
 }
 
+function ApiBadge() {
+  const [info, setInfo] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/status", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => alive && setInfo(d))
+      .catch(() => alive && setInfo({ ok: false }));
+    return () => {
+      alive = false;
+    };
+  }, []);
+  return (
+    <span
+      className={`flex items-center gap-2 ${
+        info?.ok === true ? "text-muted" : info ? "text-risk" : "text-faint"
+      }`}
+    >
+      <span className={`dot-pulse ${info?.ok === true ? "text-safe" : info ? "text-risk" : "text-faint"}`} />
+      {info?.ok
+        ? `api · ${info.service} · v${info.version} · live`
+        : info
+        ? "api · unreachable · client eval"
+        : "api · connecting…"}
+    </span>
+  );
+}
+
 export default function Page() {
   const [booted, setBooted] = useState(false);
   const [tab, setTab] = useState("overview");
@@ -296,8 +324,12 @@ export default function Page() {
           {tab === "forecast" && <PredictivePanel />}
         </div>
 
-        <footer className="mt-14 hairline pt-4 text-center font-mono text-[10px] uppercase tracking-widest text-faint">
-          risk model · traffic 30 · weather 25 · visibility 20 · road 15 · speed 10 /100
+        <footer className="mt-14">
+          <div className="hairline" />
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pt-4 text-center font-mono text-[10px] uppercase tracking-widest text-faint">
+            <span>risk model · traffic 30 · weather 25 · visibility 20 · road 15 · speed 10 /100</span>
+            <ApiBadge />
+          </div>
         </footer>
       </div>
     </main>

@@ -110,3 +110,28 @@ export const segments = raw.map(([city, name, roadType, lengthKm, trafficDensity
 export const cities = [...new Set(segments.map((s) => s.city))];
 
 export const totalAccidents = segments.reduce((t, s) => t + s.accidents30, 0);
+
+export const CITY_COORDS = {
+  Delhi: [28.6139, 77.209],
+  Mumbai: [19.076, 72.8777],
+  Bengaluru: [12.9716, 77.5946],
+  Chennai: [13.0827, 80.2707],
+  Hyderabad: [17.385, 78.4867],
+  Kolkata: [22.5726, 88.3639],
+  Pune: [18.5204, 73.8567],
+  Jaipur: [26.9124, 75.7873],
+  Lucknow: [26.8467, 80.9462],
+  Ahmedabad: [23.0225, 72.5714],
+  Surat: [21.1702, 72.8311],
+  Vadodara: [22.3072, 73.1812],
+  Indore: [22.7196, 75.8577],
+  Nagpur: [21.1458, 79.0882],
+  Kochi: [9.9312, 76.2673],
+};
+
+export const MODEL_META = {
+  name: "RoadSafe Risk Engine",
+  version: "2.0.0",
+  engine: "5-factor weighted · traffic / weather / visibility / road / speed",
+  factors: ["traffic", "weather", "visibility", "road", "speed"],
+};

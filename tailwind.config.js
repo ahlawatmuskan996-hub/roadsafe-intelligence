@@ -8,16 +8,16 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        base: "#0a0a09",
-        panel: "#11110f",
-        raised: "#181817",
-        edge: "#242420",
-        ink: "#f3f3ee",
-        muted: "#9a9a92",
-        faint: "#666660",
-        safe: "#63bf6e",
-        warn: "#d9a03f",
-        risk: "#c9513f",
+        base: "#050505",
+        panel: "#0d0d0c",
+        raised: "#161515",
+        edge: "#2a2826",
+        ink: "#f7efe2",
+        muted: "#b6aca0",
+        faint: "#6f6a63",
+        safe: "#10b981",
+        warn: "#f472b6",
+        risk: "#dc2626",
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "sans-serif"],

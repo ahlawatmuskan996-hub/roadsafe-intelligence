@@ -12,6 +12,7 @@ import CompareView from "@/components/CompareView";
 import PredictivePanel from "@/components/PredictivePanel";
 import Preloader from "@/components/Preloader";
 import Reveal from "@/components/Reveal";
+import { getWeatherForCity } from "@/lib/weatherApi";
 
 const TABS = [
   { key: "overview", label: "Overview" },
@@ -57,6 +58,18 @@ export default function Page() {
   const [tab, setTab] = useState("overview");
   const [activeCity, setActiveCity] = useState(cities[0]);
   const [selectedId, setSelectedId] = useState(null);
+  const [liveWeather, setLiveWeather] = useState(null);
+
+  useEffect(() => {
+    let alive = true;
+    setLiveWeather(null);
+    getWeatherForCity(activeCity).then((w) => {
+      if (alive && w) setLiveWeather(w);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [activeCity]);
 
   // sliding tab pill
   const navRef = useRef(null);
@@ -121,11 +134,27 @@ export default function Page() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.03] px-4 py-2 font-mono text-[11px] text-muted">
-                <span className="dot-pulse text-safe" />
-                LIVE MONITOR
-                <span className="text-faint">·</span>
-                <span className="tabular text-ink">{totalAccidents} crashes / 30d</span>
+              <div className="flex flex-wrap items-center justify-end gap-2.5">
+                <div className="flex items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.03] px-4 py-2 font-mono text-[11px] text-muted">
+                  <span className="dot-pulse text-safe" />
+                  LIVE MONITOR
+                  <span className="text-faint">·</span>
+                  <span className="tabular text-ink">{totalAccidents} crashes / 30d</span>
+                </div>
+                {liveWeather && (
+                  <div className="flex items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.03] px-4 py-2 font-mono text-[11px] text-muted">
+                    <span className="tabular text-ink">
+                      {activeCity} · {liveWeather.temp}°C
+                    </span>
+                    <span className="text-faint">·</span>
+                    <span className="tabular">{liveWeather.label}</span>
+                    <span className="text-faint">·</span>
+                    <span>{liveWeather.wind} km/h</span>
+                    <span className="rounded border border-white/10 px-1.5 py-0.5 text-[9px] uppercase tracking-widest text-warn">
+                      live
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </header>

@@ -9,14 +9,14 @@ module.exports = {
     extend: {
       colors: {
         base: "#050505",
-        panel: "#0d0d0c",
-        raised: "#161515",
-        edge: "#2a2826",
+        panel: "#0e0e0d",
+        raised: "#181716",
+        edge: "#302d2a",
         ink: "#f7efe2",
-        muted: "#b6aca0",
-        faint: "#6f6a63",
-        safe: "#10b981",
-        warn: "#f472b6",
+        muted: "#bcb2a4",
+        faint: "#77706a",
+        safe: "#34d399",
+        warn: "#ec4899",
         risk: "#dc2626",
       },
       fontFamily: {

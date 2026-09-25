@@ -120,6 +120,9 @@ export default function Page() {
       avg: Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10,
       high: scores.filter((s) => s > 60).length,
       fatal: segments.reduce((t, s) => t + s.fatalities30, 0),
+      injuries: segments.reduce((t, s) => t + s.injuries30, 0),
+      vehicles: segments.reduce((t, s) => t + s.vehiclesDaily, 0),
+      speedAvg: Math.round(segments.reduce((t, s) => t + s.speedCompliance, 0) / segments.length),
     };
   }, []);
 
@@ -237,6 +240,24 @@ export default function Page() {
           ))}
         </section>
         <div className="hairline" />
+
+        {/* ===== Network ledger ===== */}
+        <Reveal active={booted} delay={130}>
+          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-white/15 bg-white/15 lg:grid-cols-4">
+            {[
+              ["vehicles monitored / day", `${Math.round(stats.vehicles / 1000)}K`, "across network"],
+              ["injuries / 30d", stats.injuries.toLocaleString("en-IN"), `${stats.fatal} fatal`],
+              ["avg speed compliance", `${stats.speedAvg}%`, "driver behaviour"],
+              ["intervention funds", "₹23.4 Cr", "identified actions"],
+            ].map(([label, value, sub]) => (
+              <div key={label} className="bg-panel px-4 py-3.5">
+                <div className="kicker !text-[8.5px]">{label}</div>
+                <div className="tabular mt-1.5 font-display text-[22px] leading-none text-ink">{value}</div>
+                <div className="mt-1 font-mono text-[9px] uppercase tracking-wider text-faint">{sub}</div>
+              </div>
+            ))}
+          </div>
+        </Reveal>
 
         {/* ===== Tabs ===== */}
         <Reveal active={booted} delay={160}>
